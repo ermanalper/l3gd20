@@ -60,13 +60,7 @@ static void MX_SPI5_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
-HAL_StatusTypeDef L3GD20_Reg_Read(uint8_t regaddr, volatile uint8_t *pRX);
-HAL_StatusTypeDef L3GD20_Reg_Write(uint8_t regaddr, uint8_t data);
-void L3GD20_Init(void);
-void readX(void);
-void readY(void);
-void readZ(void);
-HAL_StatusTypeDef L3GD20_Reg_ReadMultiBytes(uint8_t baseaddr, unsigned int len, volatile uint8_t *pBuffer);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -112,13 +106,12 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   //Initialize
-  L3GD20_Init();
+  L3GD20_Init(&hspi5, &x_axis, &y_axis, &z_axis);
     while (1)
   {
     	//ana loop
-    	readX();
-    	readY();
-    	readZ();
+    	L3GD20_ReadAxes();
+
     	HAL_Delay(1);
 
     /* USER CODE END WHILE */
@@ -141,6 +134,7 @@ void SystemClock_Config(void)
   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -522,95 +516,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
     }
 }
-HAL_StatusTypeDef L3GD20_Reg_Write(uint8_t regaddr, uint8_t data) {
-	uint8_t tx[2]; // A total of 2 bytes transmitted
-	tx[0] = regaddr & 0x7F; //MSB set to 0 to write
-	tx[1] = data;
 
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); //reset CS to start communication
-
-	HAL_StatusTypeDef res = HAL_SPI_Transmit(&hspi5,
-			tx,
-			2, // 2 bytes total
-			HAL_MAX_DELAY);
-
-
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); //set CS to stop communication
-	return res;
-}
-HAL_StatusTypeDef L3GD20_Reg_Read(uint8_t regaddr, volatile uint8_t *pRX) {
-	uint8_t tx[2];
-	uint8_t rx[2];
-	tx[0] = regaddr | 0x80; //MSB set to 1 to read
-	tx[1] = 0x00; //dummy
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); //reset CS to start communication
-
-	HAL_StatusTypeDef res =  HAL_SPI_TransmitReceive(
-			&hspi5,
-			tx,
-			rx,
-			2,
-			HAL_MAX_DELAY);
-
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); //set CS to stop communication
-	*pRX = rx[1];
-	return res;
-}
-HAL_StatusTypeDef L3GD20_Reg_ReadMultiBytes(uint8_t baseaddr, unsigned int len, volatile uint8_t *pBuffer) {
-	if (len == 1) {
-		return L3GD20_Reg_Read(baseaddr, pBuffer);
-	}
-	uint8_t tx[len + 1]; //1 data + (len)*dummy
-	for(unsigned int i = 1; i < len + 1; i++){
-			tx[i] = 0x00; //reset tx
-	}
-	uint8_t rx[len + 1];
-	tx[0] = baseaddr | 0xC0;
-
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
-
-	HAL_StatusTypeDef res = HAL_SPI_TransmitReceive(
-			&hspi5,
-			tx,
-			rx,
-			len + 1,
-			HAL_MAX_DELAY);
-
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
-
-	for (unsigned int i = 0; i < len; i++) {
-		pBuffer[i] = rx[i + 1];
-	}
-	return res;
-}
-
-void L3GD20_Init(void) {
-	uint8_t ctrl1 = 0x3F; //normal mode
-	L3GD20_Reg_Write(CTRL_REG1, ctrl1);
-
-	uint8_t ctrl2 = 0x05; //reset reading HP_RESET_FILTER, cut off freq: 0.18 Hz
-	L3GD20_Reg_Write(CTRL_REG2, ctrl2);
-
-	uint8_t ctrl4 = 0x80;
-	L3GD20_Reg_Write(CTRL_REG4, ctrl4);
-
-	HAL_Delay(250);
-}
-void readX(void) {
-	uint8_t rx[2];
-	L3GD20_Reg_ReadMultiBytes(OUT_X_L, 2, rx);
-	x_axis = (int16_t) ((rx[1] << 8) | rx[0]);
-}
-void readY(void) {
-	uint8_t rx[2];
-	L3GD20_Reg_ReadMultiBytes(OUT_Y_L, 2, rx);
-	y_axis = (int16_t) ((rx[1] << 8) | rx[0]);
-}
-void readZ(void) {
-	uint8_t rx[2];
-	L3GD20_Reg_ReadMultiBytes(OUT_Z_L, 2, rx);
-	z_axis = (int16_t) ((rx[1] << 8) | rx[0]);
-}
 /* USER CODE END 4 */
 
 /**

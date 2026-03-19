@@ -1,3 +1,10 @@
+#ifndef L3GD20_H
+#define L3GD20_H
+
+#include <stdint.h>
+#include "stm32f4xx_hal.h"
+
+
 #define WHO_AM_I 0x0F
 #define CTRL_REG1 0x20
 #define CTRL_REG2 0x21
@@ -26,4 +33,13 @@
 #define INT1_DURATION 0x38
 #define L3GD20_ADDRESS 0b1101011
 
+HAL_StatusTypeDef L3GD20_Reg_Read(uint8_t regaddr, volatile uint8_t *pRX);
+HAL_StatusTypeDef L3GD20_Reg_Write(uint8_t regaddr, uint8_t data);
+void L3GD20_Init(SPI_HandleTypeDef *hspi5, volatile int16_t *x_axis, volatile int16_t *y_axis, volatile int16_t *z_axis);
+void readX(void);
+void readY(void);
+void readZ(void);
+HAL_StatusTypeDef L3GD20_Reg_ReadMultiBytes(uint8_t baseaddr, unsigned int len, volatile uint8_t *pBuffer);
+HAL_StatusTypeDef L3GD20_ReadAxes(void);
   
+#endif 
