@@ -1,8 +1,4 @@
-../Src/l3gd20.c:11:19:L3GD20_Reg_Write	24	static
-../Src/l3gd20.c:27:19:L3GD20_Reg_Read	32	static
-../Src/l3gd20.c:45:19:L3GD20_Reg_ReadMultiBytes	104	dynamic
-../Src/l3gd20.c:73:6:L3GD20_Init	32	static
-../Src/l3gd20.c:90:6:readX	16	static
-../Src/l3gd20.c:95:6:readY	16	static
-../Src/l3gd20.c:100:6:readZ	16	static
-../Src/l3gd20.c:106:19:L3GD20_ReadAxes	16	static
+../Src/l3gd20.c:90:19:L3GD20_Reg_Write	24	static
+../Src/l3gd20.c:106:6:L3GD20_Init	32	static
+../Src/l3gd20.c:132:6:L3GD20_ReadAxes_DMA	8	static
+../Src/l3gd20.c:141:6:L3GD20_ReadValuesFromRx	4	static

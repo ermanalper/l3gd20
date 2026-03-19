@@ -1,8 +1,4 @@
-../Src/l3gd20.c:11:19:L3GD20_Reg_Write	1
-../Src/l3gd20.c:27:19:L3GD20_Reg_Read	1
-../Src/l3gd20.c:45:19:L3GD20_Reg_ReadMultiBytes	4
-../Src/l3gd20.c:73:6:L3GD20_Init	1
-../Src/l3gd20.c:90:6:readX	1
-../Src/l3gd20.c:95:6:readY	1
-../Src/l3gd20.c:100:6:readZ	1
-../Src/l3gd20.c:106:19:L3GD20_ReadAxes	1
+../Src/l3gd20.c:90:19:L3GD20_Reg_Write	1
+../Src/l3gd20.c:106:6:L3GD20_Init	2
+../Src/l3gd20.c:132:6:L3GD20_ReadAxes_DMA	1
+../Src/l3gd20.c:141:6:L3GD20_ReadValuesFromRx	1

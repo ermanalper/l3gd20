@@ -41,5 +41,6 @@ void readY(void);
 void readZ(void);
 HAL_StatusTypeDef L3GD20_Reg_ReadMultiBytes(uint8_t baseaddr, unsigned int len, volatile uint8_t *pBuffer);
 HAL_StatusTypeDef L3GD20_ReadAxes(void);
-  
+void L3GD20_ReadAxes_DMA(void);
+void L3GD20_ReadValuesFromRx(void);
 #endif 
